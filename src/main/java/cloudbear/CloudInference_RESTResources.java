@@ -22,6 +22,7 @@ import ch.usi.star.bear.model.Feature;
 import ch.usi.star.bear.model.Model;
 import ch.usi.star.bear.properties.BearProperties;
 import ch.usi.star.bear.visualization.BearVisualizer;
+import cloudbear.all_in_one.rest.FiltersClassifiers;
 
 import com.sun.jersey.api.uri.UriTemplate;
 
@@ -41,15 +42,27 @@ public class CloudInference_RESTResources {
 		// BearProperties.getInstance().setProperty(BearProperties.FILTERSPACKAGEPREFIX,
 		// "cloudbear.filters.empty");
 
-		BearProperties.getInstance().setProperty(BearProperties.FILTERSPACKAGEPREFIX, "cloudbear.rest.filters");
-		BearProperties.getInstance().setProperty(BearProperties.CLASSIFIERSPACKAGEPREFIX, "cloudbear.rest.classifiers");
-		//
-		BearProperties.getInstance().setProperty(BearProperties.EVENTDURATION, "false");
+		/*
+		 * BearProperties.getInstance().setProperty(BearProperties.
+		 * FILTERSPACKAGEPREFIX, "cloudbear.rest.filters");
+		 * BearProperties.getInstance
+		 * ().setProperty(BearProperties.CLASSIFIERSPACKAGEPREFIX,
+		 * "cloudbear.rest.classifiers"); //
+		 * BearProperties.getInstance().setProperty
+		 * (BearProperties.EVENTDURATION, "false");
+		 */
+
+		/*
+		 * Suggestion: Define a single file in a single package with all the
+		 * classifiers and filters in it.
+		 */
+		BearProperties.getInstance().setProperty(BearProperties.FILTERSPACKAGEPREFIX, "cloudbear.all_in_one.rest");
+		BearProperties.getInstance().setProperty(BearProperties.CLASSIFIERSPACKAGEPREFIX, "cloudbear.all_in_one.rest");
 
 		// DEV:
 		// File file = new File("res/small-nova-api.log");
 		// TEST:
-		File file = new File("res/nova-api.log");
+		// File file = new File("res/nova-api.log");
 		/*
 		 * FINAL: SOME Log entries were malformed (the ones with error):
 		 * 2014-10-01 01:00:01 4273 INFO nova.osapi_compute.wsgi.server [-]
@@ -57,7 +70,7 @@ public class CloudInference_RESTResources {
 		 * "GET /v2/83d2db83cb7e4f61aafde0e1063cbc4b/servers/detail?status=error&all_tenants=1 HTTP/1.1"
 		 * 401 461 0.049015
 		 */
-		// File file = new File("res/merged-nova-api-no-malformed.log");
+		File file = new File("res/merged-nova-api-no-malformed.log");
 
 		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
@@ -66,12 +79,14 @@ public class CloudInference_RESTResources {
 		InferenceEngine inferenceEngine = new InferenceEngine();
 		AnalysisEngine analisysEngine = new AnalysisEngine();
 
-		// Ignored Events
+		// Dictionary: THis must be created from OpenStack !
+
+		// Ignored Requests ? Events
 		Set<String> ignoredEvents = new HashSet<String>();
-		ignoredEvents.add("Os-floating-ips");
-		ignoredEvents.add("Os-keypairs");
+		// ignoredEvents.add("Os-floating-ips");
+		// ignoredEvents.add("Os-keypairs");
 		ignoredEvents.add("Os-quota-sets-for-Tenant");
-		ignoredEvents.add("Os-security-groups");
+		// ignoredEvents.add("Os-security-groups");
 		ignoredEvents.add("Os-simple-tenant-usage-forTenant");
 
 		while ((line = br.readLine()) != null) {
@@ -87,19 +102,23 @@ public class CloudInference_RESTResources {
 				}
 			}
 		}
-		List<Model> models = inferenceEngine.exportModels();
-
-		System.out.println("CloudInference_RESTResources.main() Generate " + models.size() + " models");
 
 		br.close();
 		fr.close();
 
-		// UserID model
-		Model userModel = analisysEngine.synthesize(models, "{user=\\.*}");
+		List<Model> models = inferenceEngine.exportModels();
 
-		BearVisualizer visualizer = new BearVisualizer(userModel);
-		visualizer.display();
+		System.out.println("CloudInference_RESTResources.main() Generate " + models.size() + " models");
+		for (Model m : models) {
+			System.out.println("- " + m.getUserClass().getName() + " " + m.getUserClass().getValue());
+			BearVisualizer visualizer = new BearVisualizer(m);
+			visualizer.display();
 
+			System.in.read();
+
+		}
+		// UserID model -
+		// Model userModel = analisysEngine.synthesize(models, "{user=\\.*}");
 		// Model tenantModel = analisysEngine.synthesize(models,
 		// "{tenant=\\.*}");
 		// Model userAndTenantmodel = analisysEngine.synthesize(models,
@@ -107,10 +126,13 @@ public class CloudInference_RESTResources {
 		// visualizer = new BearVisualizer(tenantModel);
 		// visualizer.display();
 
-		// visualizer = new BearVisualizer(userAndTenantmodel);
-		// visualizer.display();
+//		String modelRegEx = "{" + FiltersClassifiers.USER_AND_TENANT + "=\\.*}";
+//		System.out.println("CloudInference_RESTResources.main() Synthetize : " + modelRegEx);
+//		Model model = analisysEngine.synthesize(models, modelRegEx);
+//		BearVisualizer visualizer = new BearVisualizer(model);
+//		visualizer.display();
 
-		// System.out.println(userIDmodel.generatePrismModel("prova"));
+		// System.out.println(model.generatePrismModel("prova"));
 		// String result = analisysEngine.analyze(model, pctl, "BEAR", false);
 		// System.out.println(result);
 

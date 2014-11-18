@@ -1,0 +1,35 @@
+Tipi possibili di modello ed inferenza
+
+Definizione AP-Labels/Rewards e criteri di 'partizione' (per esempio su utente/tenant) e definizione opzionale di
+Sessione (stop->start)
+	-> Inferenza
+		=> tanti modelli "omogenei"
+
+Merging dei modelli (selezione/sotto-insieme di modelli)
+	-> Sintesi
+		=> 1 modello con probabilita'/archi aggiornati
+		
+Definizioni di proprieta' da verificare sull' UNICO modello
+	-> Query
+		=> Proprieta' verificata/non verificata
+
+
+Proprieta' e concetti che sono presenti nei log:
+	- Risorse REST ed operazioni
+	- API e chiamate ad API
+	
+Proprieta' e concetti che vogliamo modellare:
+	- Dipendenze tra API ?
+
+Proprieta' e concetti che il modello rappresenta:
+	- Uso del sistema/delle API	
+	
+Possibili modelli
+	- Solo Risorse
+	- Risorse ed Operazioni
+	
+	
+## PARSING
+
+http://docs.openstack.org/admin-guide-cloud/content/log-files-for-openstack-compute.html
+http://docs.openstack.org/openstack-ops/content/logging_monitoring.html
